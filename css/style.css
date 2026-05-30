@@ -1,0 +1,198 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  color: #e2e8f0;
+}
+
+.app {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.status {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 16px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.status.win {
+  border-color: #22c55e;
+  background: #14532d33;
+}
+
+.status.lose {
+  border-color: #ef4444;
+  background: #7f1d1d33;
+}
+
+.letter-box {
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #cbd5e1;
+}
+
+.letter-box strong {
+  display: inline-block;
+  min-width: 1.5em;
+  font-size: 1.5rem;
+  color: #fbbf24;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.input-row input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #f1f5f9;
+  font-size: 1rem;
+}
+
+.input-row input:focus {
+  outline: 2px solid #3b82f6;
+  border-color: transparent;
+}
+
+.input-row input:disabled {
+  opacity: 0.6;
+}
+
+button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.primary {
+  background: #2563eb;
+  color: white;
+}
+
+button.primary:hover {
+  background: #1d4ed8;
+}
+
+button.secondary {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+button.secondary:hover {
+  background: #475569;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.actions button {
+  flex: 1;
+}
+
+.history {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #334155;
+}
+
+.history h2 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: #94a3b8;
+}
+
+#historyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+#historyList li {
+  padding: 8px 0;
+  border-bottom: 1px solid #334155;
+  line-height: 1.4;
+}
+
+#historyList li:last-child {
+  border-bottom: none;
+}
+
+#historyList li.empty {
+  color: #64748b;
+  font-style: italic;
+}
+
+#historyList .player {
+  color: #93c5fd;
+}
+
+#historyList .bot {
+  color: #fcd34d;
+}
+
+.rules {
+  margin-top: 20px;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.rules summary {
+  cursor: pointer;
+  color: #cbd5e1;
+}
+
+.rules ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 400px) {
+  .input-row {
+    flex-direction: column;
+  }
+}
