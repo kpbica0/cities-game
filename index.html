@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Игра в города — Россия</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>🏙 Игра в города</h1>
+      <p class="subtitle">Россия · ты против бота</p>
+    </header>
+
+    <section class="status" id="status">
+      Нажми «Новая игра», чтобы начать. Первым ходишь ты.
+    </section>
+
+    <section class="letter-box hidden" id="letterBox">
+      Следующий город на букву: <strong id="requiredLetter">—</strong>
+    </section>
+
+    <form class="input-row hidden" id="form">
+      <input
+        type="text"
+        id="cityInput"
+        placeholder="Введи город..."
+        autocomplete="off"
+        maxlength="64"
+      >
+      <button type="submit" id="submitBtn">Ход</button>
+    </form>
+
+    <div class="actions">
+      <button type="button" id="newGameBtn" class="primary">Новая игра</button>
+      <button type="button" id="giveUpBtn" class="secondary hidden">Сдаться</button>
+    </div>
+
+    <section class="history">
+      <h2>История ходов</h2>
+      <ul id="historyList">
+        <li class="empty">Пока пусто</li>
+      </ul>
+    </section>
+
+    <details class="rules">
+      <summary>Правила</summary>
+      <ul>
+        <li>Города только из списка РФ (без повторов).</li>
+        <li>Следующий город начинается на последнюю букву предыдущего.</li>
+        <li>Буквы <strong>ь, ъ, ы, й</strong> не считаются — берётся буква перед ними.</li>
+        <li>Пример: <em>Тверь</em> → следующий на <strong>Р</strong>.</li>
+      </ul>
+    </details>
+  </div>
+
+  <script src="js/cities.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
