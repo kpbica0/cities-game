@@ -1,4 +1,5 @@
 const SKIP_LETTERS = new Set(["ь", "ъ", "ы", "й"]);
+const TURN_SECONDS = 60;
 
 const cityIndex = new Map();
 const citiesByFirst = new Map();
@@ -8,7 +9,7 @@ function normalizeName(name) {
 }
 
 function canonicalKey(name) {
-  return normalizeName(name).toLowerCase();
+  return normalizeName(name).toLowerCase().replace(/ё/g, "е");
 }
 
 function getLastLetter(name) {
@@ -35,6 +36,13 @@ function buildIndex() {
     if (!citiesByFirst.has(first)) citiesByFirst.set(first, []);
     citiesByFirst.get(first).push(city);
   }
+
+  if (typeof ALIASES !== "undefined") {
+    for (const [alias, city] of Object.entries(ALIASES)) {
+      const key = canonicalKey(alias);
+      if (!cityIndex.has(key)) cityIndex.set(key, city);
+    }
+  }
 }
 
 buildIndex();
@@ -44,11 +52,15 @@ const state = {
   used: new Set(),
   requiredLetter: "",
   waitingBot: false,
+  timerId: null,
+  timerEndsAt: 0,
 };
 
 const statusEl = document.getElementById("status");
 const letterBoxEl = document.getElementById("letterBox");
 const requiredLetterEl = document.getElementById("requiredLetter");
+const timerBoxEl = document.getElementById("timerBox");
+const timerEl = document.getElementById("timer");
 const formEl = document.getElementById("form");
 const inputEl = document.getElementById("cityInput");
 const submitBtnEl = document.getElementById("submitBtn");
@@ -64,10 +76,54 @@ function setStatus(text, type = "") {
 
 function showPlayingUI(show) {
   letterBoxEl.classList.toggle("hidden", !show);
+  timerBoxEl.classList.toggle("hidden", !show);
   formEl.classList.toggle("hidden", !show);
   giveUpBtn.classList.toggle("hidden", !show);
   inputEl.disabled = !show || state.waitingBot;
   submitBtnEl.disabled = !show || state.waitingBot;
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function updateTimerDisplay() {
+  if (!state.active || state.waitingBot || !state.timerEndsAt) {
+    timerEl.textContent = formatTime(TURN_SECONDS);
+    timerBoxEl.classList.remove("warning", "critical");
+    return;
+  }
+
+  const left = Math.max(0, Math.ceil((state.timerEndsAt - Date.now()) / 1000));
+  timerEl.textContent = formatTime(left);
+
+  timerBoxEl.classList.toggle("warning", left <= 20 && left > 10);
+  timerBoxEl.classList.toggle("critical", left <= 10);
+
+  if (left <= 0) {
+    stopTurnTimer();
+    finishGame("Время вышло! Ты не назвал город за 1 минуту.", "lose");
+  }
+}
+
+function stopTurnTimer() {
+  if (state.timerId !== null) {
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+  state.timerEndsAt = 0;
+  timerBoxEl.classList.remove("warning", "critical");
+}
+
+function startTurnTimer() {
+  stopTurnTimer();
+  if (!state.active || state.waitingBot) return;
+
+  state.timerEndsAt = Date.now() + TURN_SECONDS * 1000;
+  updateTimerDisplay();
+  state.timerId = setInterval(updateTimerDisplay, 250);
 }
 
 function addHistory(who, city, note = "") {
@@ -92,13 +148,25 @@ function pickBotCity(letter) {
 }
 
 function finishGame(message, type) {
+  stopTurnTimer();
   state.active = false;
   state.waitingBot = false;
+  timerEl.textContent = "—";
   setStatus(message, type);
   showPlayingUI(false);
 }
 
+function beginPlayerTurn(message) {
+  state.waitingBot = false;
+  inputEl.disabled = false;
+  submitBtnEl.disabled = false;
+  inputEl.focus();
+  setStatus(message);
+  startTurnTimer();
+}
+
 function afterPlayerMove(city) {
+  stopTurnTimer();
   const key = canonicalKey(city);
   state.used.add(key);
   addHistory("player", city);
@@ -124,11 +192,6 @@ function afterPlayerMove(city) {
     requiredLetterEl.textContent = state.requiredLetter.toUpperCase();
 
     const playerCanMove = availableCities(state.requiredLetter, state.used).length > 0;
-    state.waitingBot = false;
-    inputEl.disabled = false;
-    submitBtnEl.disabled = false;
-    inputEl.focus();
-
     if (!playerCanMove) {
       finishGame(
         `Проигрыш. На «${state.requiredLetter.toUpperCase()}» (${botCity}) у тебя нет подходящего города.`,
@@ -137,7 +200,7 @@ function afterPlayerMove(city) {
       return;
     }
 
-    setStatus(`Твой ход. Назови город на «${state.requiredLetter.toUpperCase()}».`);
+    beginPlayerTurn(`Твой ход. Назови город на «${state.requiredLetter.toUpperCase()}». У тебя 1 минута.`);
   }, 700);
 }
 
@@ -169,6 +232,7 @@ function validatePlayerCity(raw) {
 }
 
 function startGame() {
+  stopTurnTimer();
   state.active = true;
   state.used = new Set();
   state.requiredLetter = "";
@@ -176,9 +240,8 @@ function startGame() {
   historyListEl.innerHTML = '<li class="empty">Пока пусто</li>';
   requiredLetterEl.textContent = "—";
   inputEl.value = "";
-  setStatus("Твой первый ход. Назови любой город России.");
   showPlayingUI(true);
-  inputEl.focus();
+  beginPlayerTurn("Твой первый ход. Назови любой город России. У тебя 1 минута.");
 }
 
 formEl.addEventListener("submit", (event) => {
@@ -204,6 +267,12 @@ giveUpBtn.addEventListener("click", () => {
 
 inputEl.addEventListener("input", () => {
   inputEl.value = inputEl.value.replace(/[^а-яёА-ЯЁ\s-]/g, "");
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && state.active && !state.waitingBot) {
+    updateTimerDisplay();
+  }
 });
 
 showPlayingUI(false);

@@ -21,6 +21,11 @@
       Следующий город на букву: <strong id="requiredLetter">—</strong>
     </section>
 
+    <section class="timer-box hidden" id="timerBox">
+      <span class="timer-label">Время на ход</span>
+      <strong id="timer">1:00</strong>
+    </section>
+
     <form class="input-row hidden" id="form">
       <input
         type="text"
@@ -51,6 +56,7 @@
         <li>Следующий город начинается на последнюю букву предыдущего.</li>
         <li>Буквы <strong>ь, ъ, ы, й</strong> не считаются — берётся буква перед ними.</li>
         <li>Пример: <em>Тверь</em> → следующий на <strong>Р</strong>.</li>
+        <li>На каждый ход — <strong>1 минута</strong>. Не успел — проигрыш.</li>
       </ul>
     </details>
   </div>

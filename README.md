@@ -21,7 +21,8 @@
 |------|------------|
 | `index.html` | Страница игры |
 | `js/game.js` | Логика и бот |
-| `js/cities.js` | 226 городов РФ |
-| `build_cities.py` | Добавить города в список |
+| `js/cities.js` | 1100+ городов РФ |
+| `russia-cities.json` | Источник списка (arbaev/russia-cities) |
+| `build_cities.py` | Пересборка `cities.js` из JSON |
 
 Подробнее: `КАК-ИГРАТЬ.md`
